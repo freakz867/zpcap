@@ -1,4 +1,5 @@
 #include "sniff.h"
+#include "mitm.h"
 #include <stdio.h>
 
 #define PROG_NAME	"ZeroProgCap"
@@ -46,7 +47,8 @@ int main()
 {
 	
 	display_description();
-
+	u_char arp_pack[100];
+	int ret = construct_packet(arp_pack);
 	pcap_if_t *alldevs;
 	pcap_if_t *d;
 	int inum;
@@ -54,7 +56,7 @@ int main()
 	pcap_t *adhandle;
 	char errbuf[PCAP_ERRBUF_SIZE];
 	u_int netmask;
-	char packet_filter[] = "port 80";
+	char packet_filter[] = "";
 	struct bpf_program fcode;
 
     /* Retrieve the device list */
@@ -109,6 +111,14 @@ int main()
         pcap_freealldevs(alldevs);
         return -1;
     }
+	   /* Send down the packet */
+	for(int y = 0; y < 100; y++)
+    if (pcap_sendpacket(adhandle, arp_pack, sizeof(arp_pack) /* size */) != 0)
+    {
+        fprintf(stderr,"\nError sending the packet: \n", pcap_geterr(fp));
+        return;
+    }
+}
     
     /* Check the link layer. We support only Ethernet for simplicity. */
     if(pcap_datalink(adhandle) != DLT_EN10MB)

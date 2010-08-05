@@ -78,6 +78,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mitm.cpp" />
     <ClCompile Include="sniff.cpp" />
   </ItemGroup>
   <ItemGroup>
