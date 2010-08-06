@@ -47,8 +47,9 @@ int main()
 {
 	
 	display_description();
-	u_char arp_pack[100];
-	int ret = construct_packet(arp_pack);
+	unsigned char * packet;
+	packet = (unsigned char *)malloc(28);
+	int ret = construct_packet(packet);
 	pcap_if_t *alldevs;
 	pcap_if_t *d;
 	int inum;
@@ -111,15 +112,7 @@ int main()
         pcap_freealldevs(alldevs);
         return -1;
     }
-	   /* Send down the packet */
-	for(int y = 0; y < 100; y++)
-    if (pcap_sendpacket(adhandle, arp_pack, sizeof(arp_pack) /* size */) != 0)
-    {
-        fprintf(stderr,"\nError sending the packet: \n", pcap_geterr(fp));
-        return;
-    }
-}
-    
+	   
     /* Check the link layer. We support only Ethernet for simplicity. */
     if(pcap_datalink(adhandle) != DLT_EN10MB)
     {
@@ -159,6 +152,15 @@ int main()
     
     /* At this point, we don't need any more the device list. Free it */
     pcap_freealldevs(alldevs);
+
+	//	for(int y = 0; y < 100; y++){
+ //   if (pcap_sendpacket(adhandle, packet, sizeof(packet) /* size */) != 0)
+ //   {
+ //       fprintf(stderr,"\nError sending the packet: \n", pcap_geterr(adhandle));
+ //       return -1;
+ //   }
+	//}
+    
     
     /* start the capture */
 
@@ -166,3 +168,67 @@ int main()
     
     return 0;
 }
+//#include <stdlib.h>
+//#include <stdio.h>
+//
+//#include <pcap.h>
+//
+//
+//void main(int argc, char **argv)
+//{
+//pcap_t *fp;
+//char errbuf[PCAP_ERRBUF_SIZE];
+//u_char packet[100];
+//int i;
+//
+//    /* Check the validity of the command line */
+//    if (argc != 2)
+//    {
+//        printf("usage: %s interface (e.g. 'rpcap://eth0')", argv[0]);
+//        return;
+//    }
+//    
+//    /* Open the output device */
+//    if ( (fp= pcap_open(argv[1],            // name of the device
+//                        100,                // portion of the packet to capture (only the first 100 bytes)
+//                        PCAP_OPENFLAG_PROMISCUOUS,  // promiscuous mode
+//                        1000,               // read timeout
+//                        NULL,               // authentication on the remote machine
+//                        errbuf              // error buffer
+//                        ) ) == NULL)
+//    {
+//        fprintf(stderr,"\nUnable to open the adapter. %s is not supported by WinPcap\n", argv[1]);
+//        return;
+//    }
+//
+//    /* Supposing to be on ethernet, set mac destination to 1:1:1:1:1:1 */
+//    packet[0]=0x68;
+//    packet[1]=0x7F;
+//    packet[2]=0x74;
+//    packet[3]=0x15;
+//    packet[4]=0xD1;
+//    packet[5]=0xC8;
+//    
+//    /* set mac source to 2:2:2:2:2:2 */
+//    packet[6]=0x02;
+//    packet[7]=0x02;
+//    packet[8]=0x02;
+//    packet[9]=0x02;
+//    packet[10]=0x02;
+//    packet[11]=0x02;
+//    
+//    /* Fill the rest of the packet */
+//    for(i=12;i<100;i++)
+//    {
+//        packet[i]=i%256;
+//    }
+//
+//    /* Send down the packet */
+//    if (pcap_sendpacket(fp, packet, 100 /* size */) != 0)
+//    {
+//        fprintf(stderr,"\nError sending the packet: \n", pcap_geterr(fp));
+//        return;
+//    }
+//
+//    return;
+//}
